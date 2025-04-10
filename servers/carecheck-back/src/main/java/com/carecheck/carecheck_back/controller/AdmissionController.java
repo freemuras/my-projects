@@ -49,7 +49,9 @@ public class AdmissionController {
 
     @Operation(summary ="환자바이탈입력", description ="해당접수번호에 등록된 바이탈 정보")
     @PostMapping("/{admissionId}/vitals")
-    public ResponseEntity<?> insertVitalInfoByAdmId(@RequestBody ReqAddVitalInAdmDto dto) {
+    public ResponseEntity<?> insertVitalInfoByAdmId(
+       @PathVariable("admissionId") int admissionId,
+       @RequestBody ReqAddVitalInAdmDto dto) {
         admissionService.insertVitalInAdm(dto);
         return ResponseEntity.ok().build();
     }
@@ -69,14 +71,18 @@ public class AdmissionController {
 
     @Operation(summary = "오더입력", description = "선택한 접수번호에 처방입력")
     @PostMapping("/{admissionId}/orders")
-    public ResponseEntity<?> insertOrderInAdm(@RequestBody List<ReqAddOrderInAdmDto> dto) {
+    public ResponseEntity<?> insertOrderInAdm(
+        @PathVariable("admissionId") int admissionId,    
+        @RequestBody List<ReqAddOrderInAdmDto> dto) {
         admissionService.insertOrderInAdm(dto);
         return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "진단입력", description = "선택한 접수번호에 주진단입력")
     @PostMapping("/{admissionId}/diagnosis")
-    public ResponseEntity<?> insertDiagnosisInAdm(@RequestBody List<ReqAddDiagnosisInAdmDto> dto) {
+    public ResponseEntity<?> insertDiagnosisInAdm(
+        @PathVariable("admissionId") int admissionId,
+        @RequestBody List<ReqAddDiagnosisInAdmDto> dto) {
         admissionService.insertDiagnosisInAdm(dto);
         return ResponseEntity.ok().build();
     } 
