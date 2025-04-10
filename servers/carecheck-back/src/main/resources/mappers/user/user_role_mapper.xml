@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.carecheck.carecheck_back.mapper.UserRoleMapper">
+    <resultMap id="userRoleResultMap" type="com.carecheck.carecheck_back.entity.UserRole">
+        <id property="userRoleId" column="user_role_id"/>
+        <result property="usercode" column="usercode"/>
+        <result property="username" column="username"/>
+        <result property="roleId" column="role_id"/>
+    </resultMap>
+    <insert id="insert" keyProperty="userRoleId" useGeneratedKeys="true">
+        insert into user_role_tb
+        values
+            (default, #{usercode}, #{roleId})
+    </insert>
+    <select id="selectByRoleId" resultMap="userRoleResultMap">
+        select
+            user_role_id, 
+            ut.usercode as usercode, 
+            username, 
+            role_id
+        from user_tb as ut
+        left outer join user_role_tb as urt
+        on ut.usercode = urt.usercode
+        where urt.role_id = #{roleId}
+    </select>
+</mapper>

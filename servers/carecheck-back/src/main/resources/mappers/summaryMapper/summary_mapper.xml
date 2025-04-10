@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.carecheck.carecheck_back.mapper.SummaryMapper">
+<resultMap id="totalSummaryMap" type="com.carecheck.carecheck_back.entity.TotalSummary">
+    <id property="quarterly" column="분기"/>
+    <result property="totalSummary" column="총합"/>
+</resultMap>
+
+    <select id="selectTotalSummaryByYear" resultMap="totalSummaryMap">
+    SELECT  
+        CASE
+            WHEN MONTH(dot.created_at) IN (1, 2, 3) THEN '1분기'
+            WHEN MONTH(dot.created_at) IN (4, 5, 6) THEN '2분기'
+            WHEN MONTH(dot.created_at) IN (7, 8, 9) THEN '3분기'
+            WHEN MONTH(dot.created_at) IN (10, 11, 12) THEN '4분기'
+        END AS "분기",
+        COALESCE(SUM(dot.total_order_pay), 0) AS "총합"
+    FROM 
+        diagnosis_order_tb dot
+    WHERE 
+        YEAR(dot.created_at) = #{year}
+    GROUP BY 
+        CASE
+            WHEN MONTH(dot.created_at) IN (1, 2, 3) THEN '1분기'
+            WHEN MONTH(dot.created_at) IN (4, 5, 6) THEN '2분기'
+            WHEN MONTH(dot.created_at) IN (7, 8, 9) THEN '3분기'
+            WHEN MONTH(dot.created_at) IN (10, 11, 12) THEN '4분기'
+        END;
+
+    </select>
+
+    <select id="selectTotalSummaryByUsercode" resultMap="totalSummaryMap">
+    SELECT  
+        CASE
+            WHEN MONTH(dot.created_at) IN (1, 2, 3) THEN '1분기'
+            WHEN MONTH(dot.created_at) IN (4, 5, 6) THEN '2분기'
+            WHEN MONTH(dot.created_at) IN (7, 8, 9) THEN '3분기'
+            WHEN MONTH(dot.created_at) IN (10, 11, 12) THEN '4분기'
+        END AS '분기',
+        SUM(total_order_pay) AS '총합'
+        FROM 
+            diagnosis_order_tb AS dot
+        LEFT OUTER JOIN 
+            adm_tb AS adm
+        ON 
+            adm.adm_id = dot.adm_id
+    WHERE 
+        adm.usercode = #{usercode} AND YEAR(dot.created_at) = #{year}
+    GROUP BY 
+        CASE
+            WHEN MONTH(dot.created_at) IN (1, 2, 3) THEN '1분기'
+            WHEN MONTH(dot.created_at) IN (4, 5, 6) THEN '2분기'
+            WHEN MONTH(dot.created_at) IN (7, 8, 9) THEN '3분기'
+            WHEN MONTH(dot.created_at) IN (10, 11, 12) THEN '4분기'
+        END;
+    </select>
+</mapper>

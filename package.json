@@ -1,0 +1,17 @@
+{
+  "name": "freemuras",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "carecheck-front:dev": "pnpm --filter carecheck-front dev",
+    "carecheck-front:build": "pnpm --filter carecheck-front build",
+    "carecheck-front:start": "pnpm --filter carecheck-front start",
+    "carecheck-front:lint": "pnpm --filter carecheck-front lint",
+    "carecheck-front:codegen": "pnpm --filter carecheck-front codegen"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

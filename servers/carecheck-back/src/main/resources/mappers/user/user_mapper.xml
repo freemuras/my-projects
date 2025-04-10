@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.carecheck.carecheck_back.mapper.UserMapper">
+    <resultMap id="roleResultMap" type="com.carecheck.carecheck_back.entity.Role">
+        <id property="roleId" column="role_id" />
+        <result property="roleName" column="role_name" />
+    </resultMap>
+
+    <resultMap id="userRoleResultMap" type="com.carecheck.carecheck_back.entity.UserRole">
+        <id property="userRoleId" column="user_role_id" />
+        <result property="usercode" column="urt_usercode" />
+        <result property="roleId" column="urt_role_id" />
+        <association property="role" resultMap="roleResultMap" />
+    </resultMap>
+
+    <resultMap id="userResultMap" type="com.carecheck.carecheck_back.entity.User" >
+        <id property="index" column="index" />
+        <result property="username" column="username" />
+        <result property="usercode" column="usercode" />
+        <result property="password" column="password" />
+        <result property="email" column="email" />
+        <result property="phoneNumber" column="phonenumber" />
+        <result property="accountExpired" column="account_expired" />
+        <result property="accountLocked" column="account_locked" />
+        <result property="credentialsExpired" column="credentials_expired" />
+        <result property="accountEnabled" column="account_enabled" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+        <result property="createdAtDateFormat" column="ut_created_at" />
+        <result property="updatedAtDateFormat" column="ut_updated_at" />
+        <collection property="userRole" resultMap="userRoleResultMap" />
+    </resultMap>
+
+    <insert id="insert" keyProperty="index" useGeneratedKeys="true">
+        insert into user_tb
+        values (
+            default,
+            #{username},
+            #{usercode},
+            #{password},
+            #{email},
+            #{phoneNumber},
+            #{accountExpired},
+            #{accountLocked},
+            #{credentialsExpired},
+            #{accountEnabled},
+            now(),
+            now()
+        )
+    </insert>
+
+    <update id="updatePasswordByCode">
+        update user_tb
+        set
+            password = #{password},
+            updated_at = now()
+        where
+            usercode = #{usercode}
+    </update>
+
+    <update id="updateEmailByCode">
+        update user_tb
+        set
+            email = #{email},
+            updated_at = now()
+        where
+            usercode = #{usercode}
+    </update>
+
+    <update id="updatePhoneNumberByCode">
+        update user_tb
+        set
+            phonenumber = #{phoneNumber},
+            updated_at = now()
+        where
+            usercode = #{usercode}
+    </update>
+
+    <select id="selectById" resultMap="userResultMap">
+        select
+            ut.index,
+            ut.username,
+            ut.usercode,
+            ut.password,
+            ut.email,
+            ut.phoneNumber,
+            ut.account_expired,
+            ut.account_locked,
+            ut.credentials_expired,
+            ut.account_enabled,
+            ut.created_at,
+
+            urt.user_role_id,
+            urt.usercode as urt_usercode,
+            urt.role_id as urt_role_id,
+
+            rt.role_id,
+            rt.role_name
+        from
+            user_tb ut
+            left outer join user_role_tb urt on(urt.usercode = ut.usercode)
+            left outer join role_tb rt on(rt.role_id = urt.role_id)
+        where
+            ut.index = #{userId}
+    </select>
+
+    <select id="selectByUsername" resultType="com.carecheck.carecheck_back.entity.User">
+`       select
+            ut.index,
+            ut.username,
+            ut.usercode,
+            ut.password,
+            ut.email,
+            ut.phoneNumber,
+            ut.account_expired,
+            ut.account_locked,
+            ut.credentials_expired,
+            ut.account_enabled,
+            ut.created_at,
+
+            urt.user_role_id,
+            urt.usercode as urt_usercode,
+            urt.role_id as urt_role_id,
+
+            rt.role_id,
+            rt.role_name
+        from
+            user_tb ut
+            left outer join user_role_tb urt on(urt.usercode = ut.usercode)
+            left outer join role_tb rt on(rt.role_id = urt.role_id)
+        where
+            ut.username = #{username}
+    </select>
+
+    <select id="selectUsercode" resultType="java.lang.String">
+        select
+            concat(year(now()), lpad(#{roleId}, 2, '0'), lpad(count(*) + 1, 4, '0'))
+        from
+            user_tb
+        where
+            created_at like concat(year(now()), '%')
+    </select>
+
+    <select id="selectByUsercode" resultMap="userResultMap">
+        select
+            ut.index,
+            ut.username,
+            ut.usercode,
+            ut.password,
+            ut.email,
+            ut.phoneNumber,
+            ut.account_expired,
+            ut.account_locked,
+            ut.credentials_expired,
+            ut.account_enabled,
+            ut.created_at,
+
+            urt.user_role_id,
+            urt.usercode as urt_usercode,
+            urt.role_id as urt_role_id,
+
+            rt.role_id,
+            rt.role_name
+        from
+            user_tb ut
+            left outer join user_role_tb urt on(urt.usercode = ut.usercode)
+            left outer join role_tb rt on(rt.role_id = urt.role_id)
+        where
+            ut.usercode = #{usercode}
+    </select>
+
+    <select id="selectUserListBySearchOptions" resultMap="userResultMap">
+        select
+            ut.index,
+            ut.username,
+            ut.usercode,
+            ut.password,
+            ut.email,
+            ut.phonenumber,
+            ut.account_expired,
+            ut.account_locked,
+            ut.credentials_expired,
+            ut.account_enabled,
+            ut.created_at,
+            ut.updated_at,
+            date_format(ut.created_at, "%Y-%m-%d %H:%i:%S") as ut_created_at,
+            date_format(ut.updated_at, "%Y-%m-%d %H:%i:%S") as ut_updated_at,
+
+            urt.user_role_id,
+            urt.usercode as urt_usercode,
+            urt.role_id as urt_role_id,
+
+            rt.role_id,
+            rt.role_name
+        from
+            user_tb ut
+            left outer join user_role_tb urt on(urt.usercode = ut.usercode)
+            left outer join role_tb rt on(rt.role_id = urt.role_id)
+        <where>
+            <if test="searchName != null and searchName != ''">
+                username like concat("%", #{searchName}, "%")
+            </if>
+            <if test="order != 'all'">
+                role_name = #{order}
+            </if>
+        </where>
+        limit #{startIndex}, #{limitCount}
+    </select>
+    <select id="selectUserCountAllBySearchName" resultType="java.lang.Integer">
+        select
+            count(*)
+        from
+            user_tb
+        <where>
+            <if test="searchName != null and searchName != ''">
+                username like concat("%", #{searchName}, "%")
+            </if>
+        </where>
+    </select>
+
+    <update id="updateUserByCode">
+        update user_tb
+        set
+            username = #{username},
+            email = #{email},
+            phonenumber = #{phoneNumber},
+            updated_at = now()
+        where
+            usercode = #{usercode}
+    </update>
+    <update id="updateUserPasswordByCode">
+        update user_tb
+        set
+            password = #{password},
+            updated_at = now()
+        where
+            usercode = #{usercode}
+    </update>
+    <update id="updateUserAccountByCode">
+        update user_tb
+        set
+            account_enabled = 0,
+            updated_at = now()
+        where
+            usercode = #{usercode}
+    </update>
+</mapper>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.carecheck.carecheck_back.mapper.PatientMapper">
+    <resultMap id="patientResultMap" type="com.carecheck.carecheck_back.entity.Patient">
+        <id property="patientId" column="patient_id" />
+        <result property="patientName" column="patient_name" />
+        <result property="phoneNum" column="phone_num" />
+        <result property="regidentNum" column="regident_num" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+
+        <result property="createdAtDateFormat" column="pt_created_at" />
+        <result property="updatedAtDateFormat" column="pt_updated_at" />
+    </resultMap>
+
+    <insert id="insertPatient" keyProperty="patientId" useGeneratedKeys="true">
+        insert into patient_tb
+        values(default, #{patientName}, #{regidentNum}, #{phoneNum}, now(), now())
+    </insert>
+    <select id="selectPatientById" resultMap="patientResultMap">
+        select
+            patient_id,
+            patient_name,
+            phone_num,
+            regident_num,
+            created_at,
+            updated_at
+        from
+            patient_tb
+        where
+            patient_id = #{patientId}
+    </select>
+    <select id="selectPatientsCount" resultType="java.lang.Integer">
+        select
+            count(*)
+        from
+            patient_tb
+        <where>
+            <if test="patientName != null and patientName != ''">
+                patient_name like concat("%", #{patientName}, "%")
+            </if>
+        </where>
+    </select>
+    <select id="selectPatientsByName" resultMap="patientResultMap">
+        select
+            patient_id,
+            patient_name,
+            phone_num,
+            regident_num,
+            date_format(created_at, "%Y-%m-%d %H:%i:%S") as pt_created_at,
+            date_format(updated_at, "%Y-%m-%d %H:%i:%S") as pt_updated_at
+        from
+            patient_tb
+        <where>
+            <if test="patientName != null and patientName != ''">
+                patient_name like concat("%", #{patientName}, "%")
+            </if>
+        </where>
+        limit #{startIndex}, #{limitCount}
+    </select>
+
+</mapper>

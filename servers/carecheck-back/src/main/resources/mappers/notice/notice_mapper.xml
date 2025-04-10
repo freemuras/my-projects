@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.carecheck.carecheck_back.mapper.NoticeMapper">
+    <insert id="insertNotice">
+        insert into notice_tb
+        values(
+          default,
+          #{usercode},
+          #{title},
+          #{content},
+          #{viewCount},
+          now(),
+          now()
+        )
+    </insert>
+
+    <select id="selectNoticeBySearchOption" resultType="com.carecheck.carecheck_back.entity.NoticeSearch">
+        select
+            nt.notice_id as noticeId,
+            ut.username as username,
+            nt.title as title,
+            nt.content as content,
+            nt.view_count as viewCount,
+            nt.created_at as createdAt,
+            nt.updated_at as updatedAt
+        from
+            notice_tb nt
+            left join user_tb ut on(ut.usercode = nt.usercode)
+        <where>
+            <if test="searchText != null and searchText != ''">
+                nt.title like concat("%", #{searchText}, "%")
+            </if>
+        </where>
+        order by
+        <choose>
+            <when test="order == 'oldest'">
+                noticeId asc,
+            </when>
+            <when test="order == 'viewsDesc'">
+                viewCount desc,
+            </when>
+            <when test="order == 'viewsAsc'">
+                viewCount asc,
+            </when>
+        </choose>
+        noticeId desc
+        limit #{startIndex}, #{limitCount}
+    </select>
+    <select id="selectNoticeCountAllBySearchText" resultType="java.lang.Integer">
+        select
+            count(*)
+        from
+            notice_tb
+        <where>
+            <if test="searchText != null and searchText != ''">
+                title like concat("%", #{searchText}, "%")
+            </if>
+        </where>
+    </select>
+
+    <select id="selectNoticeByUsercode" resultType="com.carecheck.carecheck_back.entity.NoticeSearch">
+        select
+            nt.notice_id as noticeId,
+            ut.username as username,
+            nt.usercode as usercode,
+            nt.title as title,
+            nt.content as content,
+            nt.created_at as createdAt,
+            nt.updated_at as updatedAt
+        from
+            notice_tb nt
+            left join user_tb ut on(ut.usercode = nt.usercode)
+        <where>
+            nt.usercode = #{usercode}
+            <if test="searchText != null and searchText != ''">
+                AND nt.title like concat("%", #{searchText}, "%")
+            </if>
+        </where>
+        <choose>
+            <when test="order == 'asc'">
+                order by nt.created_at asc
+            </when>
+            <otherwise>
+                order by nt.created_at desc
+            </otherwise>
+        </choose>
+        limit #{startIndex}, #{limitCount}
+    </select>
+
+    <select id="selectNoticeCountUsercodeBySearchText" resultType="java.lang.Integer">
+        select
+            count(*)
+        from
+            notice_tb nt
+        <where>
+            nt.usercode = #{usercode}
+            <if test="searchText != null and searchText != ''">
+                AND nt.title like concat("%", #{searchText}, "%")
+            </if>
+        </where>
+    </select>
+
+
+    <update id="updateNoticeByNoticeId">
+        update notice_tb
+        set
+            title = #{notice.title},
+            content = #{notice.content},
+            updated_at = now()
+        where
+            usercode = #{usercode}
+            and notice_id = #{noticeId}
+    </update>
+
+    <update id="increaseViewCount">
+        update
+            notice_tb
+        set
+            view_count = view_count + 1
+        where
+            notice_id = #{noticeId}
+    </update>
+
+    <delete id="deleteNotice">
+        delete
+        from
+            notice_tb
+        where
+            notice_id = #{noticeId}
+    </delete>
+</mapper>

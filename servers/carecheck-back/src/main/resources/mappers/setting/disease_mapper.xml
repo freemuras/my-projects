@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.carecheck.carecheck_back.mapper.DiseaseMapper">
+    <resultMap id="diseaseResultMap" type="com.carecheck.carecheck_back.entity.Disease">
+        <id property="diseaseCode" column="disease_code"/>
+        <result property="diaseseEName" column="disease_e_name"/>
+        <result property="diseaseKName" column="disease_k_name"/>
+    </resultMap>
+
+    <insert id="insertDisease">
+        insert into disease_tb
+        values (default, #{eName}, #{kName})
+    </insert>
+
+    <select id="selectDiseaseByDiseaseName" resultMap="diseaseResultMap">
+        select disease_code, disease_e_name, disease_k_name
+        from disease_tb
+        where disease_k_name like concat('%', #{diseaseName}, '%')
+    </select>
+</mapper>

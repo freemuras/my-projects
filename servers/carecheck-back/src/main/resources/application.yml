@@ -1,0 +1,45 @@
+spring:
+  profiles:
+    active: local
+    group:
+      local: local_server, common, secret
+      blue: blue_server, common, secret
+
+---
+
+
+server:
+  port: 8080
+react:
+  server:
+    protocol: http
+    host: localhost
+    port: 5173
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: blue_server
+
+---
+spring:
+  config:
+    activate:
+      on-profile: common
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+springdoc:
+  override-with-generic-response: false
+
+mybatis:
+  mapper-locations:
+    - /mappers/patient/*.xml
+    - /mappers/user/*.xml
+    - /mappers/setting/*.xml
+    - /mappers/adminMapper/*.xml
+    - /mappers/notice/*.xml
+    - /mappers/summaryMapper/*.xml

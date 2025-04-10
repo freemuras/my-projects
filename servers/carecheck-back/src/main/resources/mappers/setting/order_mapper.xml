@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.carecheck.carecheck_back.mapper.OrderMapper">
+    <resultMap id="orderResultMap" type="com.carecheck.carecheck_back.entity.Order">
+        <id property="orderCode" column="order_code" />
+        <result property="orderName" column="order_name" />
+        <result property="createAt" column="created_at" />
+        <result property="updateAt" column="updated_at" />
+    </resultMap>
+
+    <insert id="insertOrder">
+        insert into order_tb
+        values(
+            #{orderCode},
+            #{orderName},
+            #{orderScore},
+            now(),
+            now()
+        )
+    </insert>
+
+    <select id="selectAllByOrderNameContaining" resultMap="orderResultMap">
+        select
+            order_code,
+            order_name
+        from
+            order_tb
+        where
+            order_name like concat("%", #{orderName}, "%")
+    </select>
+
+    <insert id="insertScorePay">
+        insert score_pay_tb
+        values(default, #{scorePay}, now(), now())
+    </insert>
+
+    <update id="updateScoreById">
+        update score_pay_tb 
+            set score_pay = #{scorePay}
+            where score_pay_id = 1 
+    </update>
+</mapper>
